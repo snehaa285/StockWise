@@ -71,6 +71,26 @@ public class AuthLoginEvent {
             AuthenticationMethod authenticationMethod,
             LocalDateTime occurredAt,
             String userAgent) {
+        if (eventType == null) {
+            throw new IllegalArgumentException("eventType is required");
+        }
+        if (authenticationMethod == null) {
+            throw new IllegalArgumentException("authenticationMethod is required");
+        }
+        if (occurredAt == null) {
+            throw new IllegalArgumentException("occurredAt is required");
+        }
+        if (session == null && eventType != AuthEventType.LOGIN_FAILURE) {
+            throw new IllegalArgumentException("Only login failures may omit a session");
+        }
+        if (session != null
+                && (user == null
+                        || session.getUser() == null
+                        || user.getId() == null
+                        || session.getUser().getId() == null
+                        || !user.getId().equals(session.getUser().getId()))) {
+            throw new IllegalArgumentException("Session must belong to the event user");
+        }
         return new AuthLoginEvent(
                 UUID.randomUUID(),
                 user,

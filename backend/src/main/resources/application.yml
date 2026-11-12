@@ -3,6 +3,9 @@ spring:
     name: stockwise-api
   profiles:
     default: local
+    group:
+      tidb:
+        - mysql
 
 server:
   port: ${SERVER_PORT:8080}

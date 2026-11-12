@@ -48,7 +48,7 @@ class AuthMigrationVerificationTest {
 
         Flyway flyway = Flyway.configure()
                 .dataSource(url, username, password)
-                .locations("classpath:db/migration")
+                .locations("classpath:db/migration/common", "classpath:db/migration/mysql")
                 .target(MigrationVersion.fromVersion("11"))
                 .load();
         flyway.migrate();
