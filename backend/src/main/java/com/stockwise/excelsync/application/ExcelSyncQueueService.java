@@ -130,12 +130,13 @@ public class ExcelSyncQueueService {
 
     @Transactional
     public ExcelSyncOutbox claimNext() {
-        return outboxRepository.claimNextReady()
-                .map(outbox -> {
-                    outbox.claim();
-                    return outboxRepository.save(outbox);
-                })
-                .orElse(null);
+        ExcelSyncOutbox candidate = outboxRepository.findNextReady().orElse(null);
+        if (candidate == null || outboxRepository.claimIfReady(candidate.getId()) != 1) {
+            return null;
+        }
+        return outboxRepository.findById(candidate.getId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Claimed sync outbox record disappeared."));
     }
 
     @Transactional

@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,9 +37,23 @@ public interface ExcelSyncOutboxRepository extends JpaRepository<ExcelSyncOutbox
                    AND outbox.locked_at < DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 10 MINUTE))
             ORDER BY outbox.created_at, outbox.id
             LIMIT 1
-            FOR UPDATE SKIP LOCKED
             """, nativeQuery = true)
-    Optional<ExcelSyncOutbox> claimNextReady();
+    Optional<ExcelSyncOutbox> findNextReady();
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = """
+            UPDATE excel_sync_outbox
+            SET status = 'PROCESSING',
+                locked_at = UTC_TIMESTAMP(6),
+                last_error = NULL
+            WHERE id = :id
+              AND (
+                    (status = 'PENDING' AND next_attempt_at <= UTC_TIMESTAMP(6))
+                    OR (status = 'PROCESSING'
+                        AND locked_at < DATE_SUB(UTC_TIMESTAMP(6), INTERVAL 10 MINUTE))
+              )
+            """, nativeQuery = true)
+    int claimIfReady(@Param("id") UUID id);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select outbox from ExcelSyncOutbox outbox "
