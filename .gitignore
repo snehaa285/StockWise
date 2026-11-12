@@ -1,0 +1,53 @@
+# Environment and Secret Files
+.env
+.env.*
+*.env
+*.env.*
+frontend/.env.local
+frontend/.env.*.local
+!.env.example
+!**/.env.example
+
+# Firebase and Credential Files
+*firebase*.json
+*service-account*.json
+*serviceAccount*.json
+*.pem
+*.key
+*.keystore
+*.p12
+*.pkcs12
+
+# Build Outputs and Dependencies
+backend/target/
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+
+# Logs and Temporary Files
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.sql.gz
+*.dump
+*backup*.sql
+*dump*.sql
+.DS_Store
+Thumbs.db
+
+# IDE and Editor Files
+.idea/
+.vscode/
+
+# Local Convenience and Runner Scripts
+mvn_compile.bat
+run_mvn.bat
+run_test.bat
+run_all_tests.bat
+
+# Agent and Skill Caches
+.agents/
+.taste-skill/
+skills-lock.json
